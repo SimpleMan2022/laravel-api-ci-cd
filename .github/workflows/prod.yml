@@ -20,10 +20,16 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      # Step 6: Sync files using rsync
-      - name: "Deploy to Server via rsync"
-        run: |
-          rsync -avz --exclude='.git' --exclude='.github' --exclude='.env' --exclude='storage/app/public' ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}
+      - name: 📂 Sync files
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -avzr --delete --exclude 'storage/app/public' --exclude 'database/' --exclude '.env' --exclude=".git" --exclude=".github"
+          path: /
+          remote_path: ${{ secrets.DEPLOY_PATH }}
+          remote_host: ${{ secrets.SSH_HOST }}
+          remote_user: ${{ secrets.SSH_USER }}
+          remote_port: ${{ secrets.SSH_PORT }}
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       # Step 8: Run deployment commands on server
       - name: "Run post-deployment commands"
