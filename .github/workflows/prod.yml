@@ -14,12 +14,6 @@ jobs:
       - name: "Checkout code"
         uses: actions/checkout@v3
 
-      # Step 5: Setup SSH for rsync
-      - name: "Setup SSH"
-        uses: webfactory/ssh-agent@v0.7.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
       - name: 📂 Sync files
         uses: burnett01/rsync-deployments@6.0.0
         with:
@@ -30,6 +24,12 @@ jobs:
           remote_user: ${{ secrets.SSH_USER }}
           remote_port: ${{ secrets.SSH_PORT }}
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      # Step 5: Setup SSH for rsync
+      - name: "Setup SSH"
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       # Step 8: Run deployment commands on server
       - name: "Run post-deployment commands"
