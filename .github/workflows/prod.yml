@@ -39,6 +39,8 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           source: "."
           target: "/var/www/laravel-api"
+          script: |
+            ls -la /var/www/laravel-api
 
   deploy:
     name: 🚢 Deploy to VPS
