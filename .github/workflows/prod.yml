@@ -1,26 +1,48 @@
-name: Deploy Laravel API
+name: 🚀 Deploy Laravel API
 
 on:
   push:
     branches: [main]
 
 jobs:
-  deploy:
+  checkout:
+    name: 🛠️ Checkout Repository
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up SSH
-        uses: shivammathur/ssh-key-action@v1
-        with:
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          host: ${{ secrets.SSH_HOST }}
-          port: ${{ secrets.SSH_PORT }}
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v3
 
-      - name: Build and push Docker image
+  build:
+    name: 🏗️ Build and Push Docker Image
+    runs-on: ubuntu-latest
+    needs: checkout
+    steps:
+      - name: 🔐 Docker Login
         run: |
           docker login -u aditnugroho -p ${{ secrets.DOCKER_TOKEN }}
-          docker build -t aditnugroho/laravel-api:latest .
-          docker push aditnugroho/laravel-api:latest
-      - name: Deploy to VPS
+
+      - name: 🛠️ Build Docker Image
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "docker compose down -v && docker compose up -d"
+          docker build -t aditnugroho/laravel-api:latest .
+
+      - name: 🚀 Push Docker Image
+        run: |
+          docker push aditnugroho/laravel-api:latest
+
+  deploy:
+    name: 🚢 Deploy to VPS
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: 🔑 Connect to VPS via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd /var/www/laravel-api
+            docker compose down -v
+            docker pull aditnugroho/laravel-api:latest
+            docker compose up -d
