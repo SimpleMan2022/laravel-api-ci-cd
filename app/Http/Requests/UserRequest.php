@@ -2,11 +2,9 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Exceptions\HttpResponseException;
 
-class food_request extends FormRequest
+class UserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,8 +23,8 @@ class food_request extends FormRequest
     {
         return [
             'name' => 'required',
-            'description' => 'required',
-            'price' => 'required|min:5',
+            'email' => 'required',
+            'password' => 'required',
         ];
     }
 }

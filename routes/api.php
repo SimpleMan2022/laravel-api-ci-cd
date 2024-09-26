@@ -1,8 +1,7 @@
 <?php
 
 use App\Http\Controllers\FoodController;
-use App\Models\food;
-use Illuminate\Http\Request;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,6 +15,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/foods', [FoodController::class, 'index']);
-Route::post('/foods', [FoodController::class, 'create']);
-Route::get('/foods/{id}', [FoodController::class, 'findById']);
+Route::prefix('/foods')->controller(FoodController::class)->middleware('auth:sanctum')->group(function () {
+  Route::get('/', 'index');
+  Route::post('/create', 'create');
+  Route::get('/{id}', 'findById');
+});
+
+Route::post('/register', [UserController::class, 'create']);
+Route::post('/login', [UserController::class, 'login']);

@@ -9,7 +9,7 @@ class ResponseHelper
     if ($statusCode >= 200 && $statusCode < 400) {
       $status = 'success';
     } else {
-      $status = 'error';
+      $status = 'failed';
     }
 
     if ($data != null) {
