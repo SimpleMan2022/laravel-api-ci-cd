@@ -38,12 +38,9 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            # Copy project files to VPS
-            scp -r ./ aditnugroho@${{ secrets.SSH_HOST }}:/var/www/laravel-api
-
-            # Deploy the application
             cd /var/www/laravel-api
-            cd /var/www/laravel-api
-            docker compose down -v
+            git pull origin main
+            docker compose pull
+            docker compose down
             docker pull aditnugroho/laravel-api:latest
             docker compose up -d
