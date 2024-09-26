@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v3
+      - name: 📂 List files in repository
+        run: ls -al
 
   build:
     name: 🏗️ Build and Push Docker Image
@@ -20,8 +22,6 @@ jobs:
       - name: 🔐 Docker Login
         run: |
           docker login -u aditnugroho -p ${{ secrets.DOCKER_TOKEN }}
-      - name: 📂 List files in repository
-        run: ls -al
 
       - name: 🛠️ Build Docker Image
         run: |
