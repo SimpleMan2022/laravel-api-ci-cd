@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: 🔐 Docker Login
         run: |
-          docker login -u aditnugroho -p ${{ secrets.DOCKER_TOKEN }}
+          echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u aditnugroho --password-stdin
 
       - name: 🛠️ Checkout Repository
         uses: actions/checkout@v2
@@ -37,6 +37,57 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
+            # Copy project files to VPS
+            scp -r ./ aditnugroho@${{ secrets.SSH_HOST }}:/var/www/laravel-api
+            
+            # Deploy the application
+            cd /var/www/laravel-api
+            docker compose down -v
+            docker pull aditnugroho/laravel-api:latest
+            docker compose up -d
+name: 🚀 Deploy Laravel API
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    name: 🏗️ Build and Push Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔐 Docker Login
+        run: |
+          echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u aditnugroho --password-stdin
+
+      - name: 🛠️ Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: 🛠️ Build Docker Image
+        run: |
+          docker build -t aditnugroho/laravel-api:latest .
+
+      - name: 🚀 Push Docker Image
+        run: |
+          docker push aditnugroho/laravel-api:latest
+
+  deploy:
+    name: 🚢 Deploy to VPS
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: 🔑 Connect to VPS via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            # Copy project files to VPS
+            scp -r ./ aditnugroho@${{ secrets.SSH_HOST }}:/var/www/laravel-api
+            
+            # Deploy the application
             cd /var/www/laravel-api
             docker compose down -v
             docker pull aditnugroho/laravel-api:latest
