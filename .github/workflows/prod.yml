@@ -8,10 +8,11 @@ jobs:
   build:
     name: 🏗️ Build and Push Docker Image
     runs-on: ubuntu-latest
+
     steps:
       - name: 🔐 Docker Login
         run: |
-          echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u aditnugroho --password-stdin
+          docker login -u aditnugroho -p ${{ secrets.DOCKER_TOKEN }}
 
       - name: 🛠️ Checkout Repository
         uses: actions/checkout@v2
@@ -41,6 +42,7 @@ jobs:
             scp -r ./ aditnugroho@${{ secrets.SSH_HOST }}:/var/www/laravel-api
 
             # Deploy the application
+            cd /var/www/laravel-api
             cd /var/www/laravel-api
             docker compose down -v
             docker pull aditnugroho/laravel-api:latest
