@@ -39,8 +39,8 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd /var/www/laravel-api
-            git pull origin main
-            docker compose pull
-            docker compose down
-            docker pull aditnugroho/laravel-api:latest
-            docker compose up -d
+            pwd && ls -la
+            git pull origin main || exit 1
+            docker compose pull || exit 1
+            docker compose down || exit 1
+            docker compose up -d || exit 1
