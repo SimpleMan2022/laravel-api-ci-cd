@@ -55,9 +55,10 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            cd /var/www/laravel-api
-            pwd && ls -la
-            git pull origin main || exit 1
-            docker compose pull || exit 1
-            docker compose down || exit 1
-            docker compose up -d || exit 1
+          scp -o StrictHostKeyChecking=no docker-compose.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/laravel-api/
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+          cd /var/www/laravel-api
+          docke compose down -v
+          docker compose pull
+          docker compose up -d
+          EOF
