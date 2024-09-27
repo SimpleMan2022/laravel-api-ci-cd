@@ -45,6 +45,10 @@ jobs:
         run: |
           scp -P ${{ secrets.SSH_PORT }} docker-compose.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/laravel-api/docker-compose.yml
 
+      - name: 🚚 Copy nginx/default.conf to VPS
+        run: |
+          scp -P ${{ secrets.SSH_PORT }} nginx/default.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/etc/nginx/conf.d/default.conf
+
       - name: 🖥️ Deploy via SSH
         run: |
           ssh -tt -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
@@ -52,4 +56,5 @@ jobs:
             sudo docker compose down -v
             sudo docker compose pull
             sudo docker compose up -d
+            sudo systemctl restart nginx
           EOF
