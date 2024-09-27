@@ -53,8 +53,9 @@ jobs:
         run: |
           ssh -tt -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
             cd /var/www/laravel-api
-            sudo docker compose down -v
-            sudo docker compose pull
-            sudo docker compose up -d
-            sudo systemctl restart nginx
+            docker compose -f docker-compose.yml pull
+            docker compose  -f docker-compose.yml down
+            docker compose up -d
+            docker image prune -f
+            systemctl restart nginx
           EOF
