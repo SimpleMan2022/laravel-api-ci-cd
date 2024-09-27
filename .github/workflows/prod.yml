@@ -41,7 +41,7 @@ jobs:
             scp -o StrictHostKeyChecking=no docker-compose.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/laravel-api/
             ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
             cd /var/www/laravel-api
-            docke compose down -v
-            docker compose pull
-            docker compose up -d
+            sudo docker compose down -v
+            sudo docker compose pull
+            sudo docker compose up -d
             EOF
