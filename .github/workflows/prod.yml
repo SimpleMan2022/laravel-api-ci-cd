@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: 🔐 Docker Login
         run: |
-          docker login -u aditnugroho -p ${{ secrets.DOCKER_TOKEN }}
+          echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u aditnugroho --password-stdin
 
       - name: 🛠️ Checkout Repository
         uses: actions/checkout@v2
@@ -31,22 +31,23 @@ jobs:
     needs: build
 
     steps:
-      - name: 🔑 Deploy via SSH
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: 🛠️ Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: 🔐 Setup SSH
         run: |
           mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          # Membuat direktori jika belum ada di VPS
-          ssh -tt -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-            mkdir -p /var/www/laravel-api
-            exit
-          EOF
-          # Menyalin file docker-compose.yml ke server
-          scp -o StrictHostKeyChecking=no -P ${{ secrets.SSH_PORT }} docker-compose.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/laravel-api/docker-compose.yml
-          # Menjalankan perintah untuk menjalankan ulang container
-          ssh -tt -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+          ssh-keyscan -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: 🚚 Copy docker-compose.yml to VPS
+        run: |
+          scp -P ${{ secrets.SSH_PORT }} docker-compose.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/laravel-api/docker-compose.yml
+
+      - name: 🖥️ Deploy via SSH
+        run: |
+          ssh -tt -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
             cd /var/www/laravel-api
             sudo docker compose down -v
             sudo docker compose pull
