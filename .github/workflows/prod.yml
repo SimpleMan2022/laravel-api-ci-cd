@@ -47,7 +47,7 @@ jobs:
 
       - name: 🚚 Copy nginx/default.conf to VPS
         run: |
-          scp -P ${{ secrets.SSH_PORT }} nginx/default.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/etc/nginx/conf.d/default.conf
+          scp -P ${{ secrets.SSH_PORT }} nginx/default.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/laravel-api/nginx/default.conf
 
       - name: 🖥️ Deploy via SSH
         run: |
