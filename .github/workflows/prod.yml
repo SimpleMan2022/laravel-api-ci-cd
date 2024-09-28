@@ -57,5 +57,4 @@ jobs:
             docker compose -f docker-compose.yml down
             docker compose up -d
             docker image prune -f
-            sudo systemctl restart nginx
           EOF
